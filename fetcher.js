@@ -1,5 +1,4 @@
 /******
-
 Launch
   $ node fetcher.js `url` `filePath`
 
@@ -20,14 +19,13 @@ Launch
 
   console.log
   exit()
-  
-
-
 ******/
+
 /* CLI arguments */
 const args = process.argv.slice(2);
 const url = args[0];
 const savePath = args[1];
+
 /* Required */
 const request = require('request');
 const fs = require(`fs`);
@@ -60,7 +58,9 @@ const getBody = () => {
     saveBody(body);
   });
 };
-  // Check to see file exists
+
+/* Execution */
+// Check to see file exists
 fs.access(savePath, fs.constants.F_OK, (error) => {
   // If the file exists, check with user to see if it should be overwritten
   if (!error) {
