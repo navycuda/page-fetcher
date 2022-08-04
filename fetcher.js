@@ -24,9 +24,6 @@ Launch
 
 
 ******/
-
-
-
 /* CLI arguments */
 const args = process.argv.slice(2);
 const url = args[0];
@@ -47,18 +44,19 @@ const exit = (sender, error) => {
 const saveBody = (body) => {
   // Save the file
   fs.writeFile(savePath, body, error => {
-    if (error) exit(`writeFile()`, error);
+    if (error) {
+      exit(`invalid path `, savePath);
+    } else {
+      // Get the file size
+      const fileSize = fs.statSync(savePath).size;
+      exit(`Downloaded and saved ${fileSize} bytes to `, savePath);
+    }
   });
-  // Get the file size
-  const fileSize = fs.statSync(savePath).size;
-
-  exit(`Downloaded and saved ${fileSize} bytes to ${savePath}`);
 };
-
 // Request the body from the url
 const getBody = () => {
   request(url, (error, response, body) => {
-    if (error) exit(`request()`, error);
+    if (error) exit(`unable to resolve url: `, url);
     saveBody(body);
   });
 };
@@ -66,11 +64,14 @@ const getBody = () => {
 fs.access(savePath, fs.constants.F_OK, (error) => {
   // If the file exists, check with user to see if it should be overwritten
   if (!error) {
-    rl.question(`File Exists, would you like to overright? type yes `, (answer) => {
-      if (answer !== 'yes') {
-        exit(`user exited`, ` *exists`);
+    rl.question(`File Exists, overwrite? `, (answer) => {
+      if (answer === `yes`) {
+        getBody();
+      } else {
+        rl.close();
       }
     });
+  } else {
+    getBody();
   }
-  getBody();
 });
